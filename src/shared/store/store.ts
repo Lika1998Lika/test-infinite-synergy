@@ -1,16 +1,18 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, ConfigureStoreOptions } from "@reduxjs/toolkit";
 import { usersApi } from "../../entities/users/api/service";
-import { setupListeners } from "@reduxjs/toolkit/query";
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
-export const store = configureStore({
+export const createStore = (options?: ConfigureStoreOptions['preloadedState'] | undefined) => configureStore({
   reducer: {
     [usersApi.reducerPath]: usersApi.reducer
   },
   middleware: (getDefaultMiddleware) => 
-    getDefaultMiddleware().concat(usersApi.middleware),
+    getDefaultMiddleware().concat(usersApi.middleware, ...options),
 })
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+export const store = createStore();
 
-setupListeners(store.dispatch);
+export type AppDispatch = typeof store.dispatch;
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export type RootState = ReturnType<typeof store.getState>;
+export const useTypedSelector: TypedUseSelectorHook<RootState> = useSelector;
