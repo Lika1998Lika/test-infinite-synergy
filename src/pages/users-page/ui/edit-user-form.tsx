@@ -66,7 +66,7 @@ export const EditUserForm = ({ userId, onCancel, onSubmit }: Props) => {
         <TextField
           error={!!formMethodsEdit.formState.errors['name']}
           helperText={formMethodsEdit.formState.errors['name']?.message}
-          label="Фамилия"
+          label="Имя"
           {...formMethodsEdit.register('name')}
           sx={{ p: 0 }}
           slotProps={{
