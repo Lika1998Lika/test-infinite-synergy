@@ -1,7 +1,12 @@
 ```bash
-# clone this repository (ssh)
-https://github.com/Lika1998Lika/test-infinite-synergy# # install dependencies
+# Склонировать репозиторий(ssh)
+https://github.com/Lika1998Lika/test-infinite-synergy 
+# Установить зависимости
 npm install
-# run locally
-npm run dev
+# Запуск одной командой
+npm run start
+# Команда для запуска фронтенд
+npm run dev 
+# Команда для запуска сервера
+npm run server
 ```
