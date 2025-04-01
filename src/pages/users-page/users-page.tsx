@@ -1,8 +1,8 @@
 import { Alert, Box, Button, CircularProgress, Drawer, Stack } from '@mui/material';
 import { useGetUsersQuery, useUpdateUserMutation } from '../../entities/users/api/service'
-import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized';
+import { AutoSizer, List } from 'react-virtualized';
 import PersonIcon from '@mui/icons-material/Person';
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EditUserForm } from './ui/edit-user-form';
 import { UsersType } from '../../entities/users';
 import './style.css';
@@ -10,30 +10,32 @@ import './style.css';
 export function UsersPage() {
   const [open, setOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const listRef = useRef<List | null>(null); // 👈 Реф на List
-  const scrollPosition = useRef(0); // 👈 Храним позицию скролла
+  const [scrollTop, setScrollTop] = useState(0);
+
+  const listRef = useRef<List>(null);
+
+  const handleScroll = (position: number) => {
+    setScrollTop(position)
+  };
 
   const openModal = (id: number) => {
     setOpen(true)
     setSelectedId(id)
   };
 
-  const closeModal = () => setOpen(false);
+  const closeModal = () => {
+    setOpen(false);
+    setSelectedId(null);
+  }
 
   const { data, isLoading, error, isFetching } = useGetUsersQuery();
   const [updateUser] = useUpdateUserMutation();
 
-  // const handleUpdateUser = async (values: Omit<UsersType, 'id'>) => {
-  //   if (!selectedId) return;
-  //   await updateUser({ id: selectedId, ...values });
-  //   closeModal();
-  // };
-
-
-  const cache = useRef(new CellMeasurerCache({
-    fixedWidth: true,
-    fixedHeight: true
-  }));
+  useEffect(() => {
+    if (listRef.current) {
+      listRef.current.scrollToPosition(scrollTop)
+    }
+  }, [data]);
 
   const handleUpdateUser = async (value: Omit<UsersType, 'id'>) => {
     if (selectedId === null) {
@@ -41,20 +43,25 @@ export function UsersPage() {
       return;
     }
     try {
-      // Выполняется мутация обновления
-      if (listRef.current) {
-        scrollPosition.current = listRef.current.Grid?.state.scrollTop || 0;
-      }
-
       await updateUser({ id: selectedId, ...value }).unwrap();
-      closeModal(); // Закрытие модального окна после успешного обновления
+      closeModal();
     } catch (error) {
       console.error(error);
     }
   };
 
+
   if (!data || isFetching || isLoading) {
-    return <Box sx={{ display: 'flex', justifyContent: "center" }}><CircularProgress /></Box>
+    return <Box sx={{
+      display: 'flex',
+      justifyContent: "center",
+      alignItems: "center",
+      alignContent: "center",
+      height: "100vh",
+      width: "100%"
+    }}>
+      <CircularProgress />
+    </Box>
   };
 
   if (error) {
@@ -72,38 +79,28 @@ export function UsersPage() {
                 width={width}
                 height={height}
                 rowHeight={50}
-                deferredMeasurementCache={cache.current}
                 rowCount={data.length}
-                scrollTop={scrollPosition.current}
-                onScroll={({ scrollTop }) => (scrollPosition.current = scrollTop)}
-                rowRenderer={({ key, index, style, parent }) => {
+                onScroll={({ scrollTop }) => handleScroll(scrollTop)}
+                rowRenderer={({ key, index, style }) => {
                   const person = data[index];
 
                   return (
-                    <CellMeasurer
-                      key={key}
-                      cache={cache.current}
-                      parent={parent}
-                      columnIndex={0}
-                      rowIndex={index}
-                    >
-                      <div style={style}>
-                        <Stack direction="row" justifyContent="space-between" sx={{ border: "1px underline black" }}>
-                          <div className="list_box">
-                            <PersonIcon />
-                            <h2 className="list_text">{`${person.lastName} ${person.firstName}`}</h2>
-                          </div>
-                          <Button
-                            size="small"
-                            variant="contained"
-                            onClick={() => openModal(person.id)}
-                            sx={{ marginRight: "20px" }}
-                          >
-                            Редактировать
-                          </Button>
-                        </Stack>
-                      </div>
-                    </CellMeasurer>
+                    <div key={key} style={style}>
+                      <Stack direction="row" justifyContent="space-between" sx={{ border: "1px underline black" }}>
+                        <div className="list_box">
+                          <PersonIcon />
+                          <h2 className="list_text">{`${person.lastName} ${person.firstName}(${person.jobTitle})`}</h2>
+                        </div>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          onClick={() => openModal(person.id)}
+                          sx={{ marginRight: "20px" }}
+                        >
+                          Редактировать
+                        </Button>
+                      </Stack>
+                    </div>
                   )
                 }}
               />

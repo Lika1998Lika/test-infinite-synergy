@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Button, InputAdornment, Stack, TextField } from "@mui/material";
+import { Alert, Box, Button, CircularProgress, InputAdornment, Stack, TextField } from "@mui/material";
 import { useForm } from 'react-hook-form';
 import { schema } from "./schema";
 import { UsersType } from "../../../entities/users";
@@ -13,10 +13,9 @@ type Props = {
 }
 export const EditUserForm = ({ userId, onCancel, onSubmit }: Props) => {
 
-  const { data } = useGetUserByIdQuery(userId);
+  const { data, isLoading, isFetching, error } = useGetUserByIdQuery(userId);
   const [updateUser] = useUpdateUserMutation();
 
-  console.log(data);
   const formMethodsEdit = useForm({
     resolver: yupResolver(schema),
     defaultValues: {} as UsersType,
@@ -28,20 +27,14 @@ export const EditUserForm = ({ userId, onCancel, onSubmit }: Props) => {
     }
   }, [data, formMethodsEdit])
 
-  // const handleUpdateUser = async (values: Omit<UsersType, 'id'>) => {
-  //   if (!userId) return;
-  //   await updateUser({ id: userId, ...values });
-  //   onCancel();
-  // };
 
   const handleSubmit = formMethodsEdit.handleSubmit(
     async (value) => {
-      // Обновляем пользователя
       try {
         await updateUser({ id: userId, ...value }).unwrap();
-        onSubmit(value); // Применить изменения
+        onSubmit(value);
         formMethodsEdit.reset();
-        onCancel(); // Закрыть модальное окно
+        onCancel();
       } catch (error) {
         console.error(error);
       }
@@ -49,9 +42,27 @@ export const EditUserForm = ({ userId, onCancel, onSubmit }: Props) => {
     (error) => console.error(error)
   );
 
+  if (!data || isFetching || isLoading) {
+    return <Box sx={{
+      display: 'flex',
+      justifyContent: "center",
+      alignItems: "center",
+      alignContent: "center",
+      width: "500px",
+      height: "100vh"
+    }}>
+      <CircularProgress />
+    </Box>
+  };
+
+  if (error) {
+    return <Alert color="error">Network error</Alert>
+  };
+
   return (
+
     <form onSubmit={handleSubmit}>
-      <Stack direction="column" gap={3} sx={{ width: "500px", p: 2 }}>
+      <Stack direction="column" gap={3} sx={{ width: "500px", p: 3 }}>
         <TextField
           error={!!formMethodsEdit.formState.errors['lastName']}
           helperText={formMethodsEdit.formState.errors['lastName']?.message}
