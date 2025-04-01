@@ -29,6 +29,7 @@ export function UsersPage() {
   }
 
   const { data, isLoading, error, isFetching } = useGetUsersQuery();
+
   const [updateUser] = useUpdateUserMutation();
 
   useEffect(() => {
@@ -37,9 +38,9 @@ export function UsersPage() {
     }
   }, [data]);
 
+
   const handleUpdateUser = async (value: Omit<UsersType, 'id'>) => {
     if (selectedId === null) {
-      console.error("Selected user ID is null");
       return;
     }
     try {
@@ -49,7 +50,6 @@ export function UsersPage() {
       console.error(error);
     }
   };
-
 
   if (!data || isFetching || isLoading) {
     return <Box sx={{
@@ -63,6 +63,7 @@ export function UsersPage() {
       <CircularProgress />
     </Box>
   };
+
 
   if (error) {
     return <Alert color="error">Network error</Alert>
@@ -89,7 +90,7 @@ export function UsersPage() {
                       <Stack direction="row" justifyContent="space-between" sx={{ border: "1px underline black" }}>
                         <div className="list_box">
                           <PersonIcon />
-                          <h2 className="list_text">{`${person.lastName} ${person.firstName}(${person.jobTitle})`}</h2>
+                          <h2 className="list_text">{`${person.name}(${person.jobTitle})`}</h2>
                         </div>
                         <Button
                           size="small"

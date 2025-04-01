@@ -41,6 +41,7 @@ export const usersApi = createApi({
       }},
       invalidatesTags: (_result, _error, { id }) => [{ type: 'User', id }]
     })
+    
   }),
 });
 

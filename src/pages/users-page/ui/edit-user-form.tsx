@@ -64,10 +64,10 @@ export const EditUserForm = ({ userId, onCancel, onSubmit }: Props) => {
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={3} sx={{ width: "500px", p: 3 }}>
         <TextField
-          error={!!formMethodsEdit.formState.errors['lastName']}
-          helperText={formMethodsEdit.formState.errors['lastName']?.message}
+          error={!!formMethodsEdit.formState.errors['name']}
+          helperText={formMethodsEdit.formState.errors['name']?.message}
           label="Фамилия"
-          {...formMethodsEdit.register('lastName')}
+          {...formMethodsEdit.register('name')}
           sx={{ p: 0 }}
           slotProps={{
             input: {
@@ -75,40 +75,7 @@ export const EditUserForm = ({ userId, onCancel, onSubmit }: Props) => {
             },
           }}
         />
-        <TextField
-          error={!!formMethodsEdit.formState.errors['firstName']}
-          helperText={formMethodsEdit.formState.errors['firstName']?.message}
-          label="Имя"
-          {...formMethodsEdit.register('firstName')}
-          slotProps={{
-            input: {
-              startAdornment: <InputAdornment position="start"></InputAdornment>,
-            },
-          }}
-        />
-        <TextField
-          error={!!formMethodsEdit.formState.errors['age']}
-          helperText={formMethodsEdit.formState.errors['age']?.message}
-          type="number"
-          label="Возраст"
-          {...formMethodsEdit.register('age')}
-          slotProps={{
-            input: {
-              startAdornment: <InputAdornment position="start"></InputAdornment>,
-            },
-          }}
-        />
-        <TextField
-          error={!!formMethodsEdit.formState.errors['email']}
-          helperText={formMethodsEdit.formState.errors['email']?.message}
-          label="email"
-          {...formMethodsEdit.register('email')}
-          slotProps={{
-            input: {
-              startAdornment: <InputAdornment position="start"></InputAdornment>,
-            },
-          }}
-        />
+
         <TextField
           error={!!formMethodsEdit.formState.errors['company']}
           helperText={formMethodsEdit.formState.errors['company']?.message}
